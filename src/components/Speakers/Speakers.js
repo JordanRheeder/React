@@ -1,6 +1,20 @@
 import React from 'react';
 
-const Speakers = () => {
+const Speakers = ({speakers}) => {
+
+    return (
+        <div>
+            {speakers.map(({imageSrc,  name}) => {
+                return <img src={`images/${imageSrc}.png`}
+                    alt={name} key={imageSrc}></img>
+            })}
+        </div>
+    );
+};
+
+const EnchancedSpeakerComponent = withData(Speakers);
+
+function withData(Component) {
     const speakers = [
         {
             imageSrc: 'speaker-component-1124',
@@ -16,14 +30,9 @@ const Speakers = () => {
         }
     ];
 
-    return (
-        <div>
-            {speakers.map(({imageSrc,  name}) => {
-                return <img src={`images/${imageSrc}.png`}
-                    alt={name} key={imageSrc}></img>
-            })}
-        </div>
-    );
-};
+    return function() {
+        return <Component speakers={speakers}></Component>
+    }
+}
 
-export default Speakers;
+export default EnchancedSpeakerComponent;
