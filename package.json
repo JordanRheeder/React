@@ -7,7 +7,7 @@
     "dev": "next",
     "build": "next build",
     "start": "next start"
-  },
+  }, 
   "repository": {
     "type": "git",
     "url": "git+https://github.com/JordanRheeder/React.git"
