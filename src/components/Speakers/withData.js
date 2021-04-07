@@ -1,6 +1,6 @@
 import React from 'react';
 function withData(maxSpeakersToShow) {
-    function withData(Component) {
+    return function(Component) {
         const speakers = [
             {
                 imageSrc: 'speaker-component-1124',
