@@ -15,9 +15,9 @@ function withData(maxSpeakersToShow) {
                 name: 'Eugene Chuvyrov'
             }
         ];
-
         return function() {
-            return <Component speakers={speakers}></Component>
+            const limitSpeakers = speakers.slice(0, maxSpeakersToShow);
+            return <Component speakers={limitSpeakers}></Component>
         }
     }
 }
