@@ -1,21 +1,14 @@
-import React from 'react';
-import SpeakersRenderProps from './SpeakersRenderProps';
-
+import React, {useContext} from 'react';
+import SpeakersContext from './SpeakerContext'
 const Speakers = () => {
-    
+    const speakers = useContext(SpeakersContext);
     return (
-        <SpeakersRenderProps>
-            {({speakers}) => {
-                return (
-                    <div>
-                        {speakers.map(({imageSrc,  name}) => {
-                            return <img src={`images/${imageSrc}.png`}
-                                alt={name} key={imageSrc}></img>
-                        })}
-                    </div>
-                );
-            }}
-        </SpeakersRenderProps>
+        <div>
+            {speakers.map(({imageSrc,  name}) => {
+                return <img src={`images/${imageSrc}.png`}
+                    alt={name} key={imageSrc}></img>
+            })}
+        </div>
     );
 };
 
