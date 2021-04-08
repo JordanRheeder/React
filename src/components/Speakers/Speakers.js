@@ -4,85 +4,69 @@ import axios from 'axios';
 import SpeakerSearchBar from '../SpeakerSearchBar/SpeakerSearchBar';
 import Speaker from '../Speaker/Speaker';
 
-const Speakers = () => {
-  function toggleSpeakerFavorite(speakerRec) {
-    return {
-      ...speakerRec,
-      isFavorite: !speakerRec.isFavorite,
-    };
-  }
-  async function onFavoriteToggleHandler(speakerRec) {
-    const toggledSpeakerRec = toggleSpeakerFavorite(speakerRec);
-    const speakerIndex = speakers
-      .map((speaker) => speaker.id)
-      .indexOf(speakerRec.id);
+import requestReducer from '../../reducers/request';
 
+import {
+  GET_ALL_FAILURE,
+  GET_ALL_SUCCESS,
+  PUT_FAILURE,
+  PUT_SUCCESS,
+} from '../../actions/request';
+
+const REQUEST_STATUS = {
+  LOADING: 'loading',
+  SUCCESS: 'success',
+  ERROR: 'error',
+};
+
+const Speakers = () => {
+  const onFavoriteToggleHandler = async (speakerRec) => {
     try {
+      const toggledSpeakerRec = {
+        ...speakerRec,
+        isFavorite: !speakerRec.isFavorite,
+      };
       await axios.put(
         `http://localhost:4000/speakers/${speakerRec.id}`,
         toggledSpeakerRec,
       );
-      dispatch([
-        ...speakers.slice(0, speakerIndex),
-        toggledSpeakerRec,
-        ...speakers.slice(speakerIndex + 1),
-      ]);
+      dispatch({
+        type: PUT_SUCCESS,
+        record: toggledSpeakerRec,
+      });
     } catch (e) {
-      setStatus(REQUEST_STATUS.ERROR);
-      setError(e);
+      dispatch({
+        type: PUT_FAILURE,
+        error: e,
+      });
     }
-  }
+  };
 
   const [searchQuery, setSearchQuery] = useState('');
-
-  const REQUEST_STATUS = {
-    LOADING: 'loading',
-    SUCCESS: 'success',
-    ERROR: 'error',
-  };
-
-  const reducer = (state, action) => {
-    switch (action.type) {
-      case 'GET_ALL_SUCCESS':
-        return {
-          ...state,
-          status: REQUEST_STATUS.SUCCESS,
-          speakers: action.speakers,
-        };
-      case 'UPDATE_STATUS':
-        return {
-          ...state,
-          status: action.status,
-        };
-    }  
-
-      
-  };
-
-  const [{speakers, status}, dispatch] = useReducer(reducer, {
-    status: REQUEST_STATUS.LOADING,
-    speakers: [],
-  });
-  // const [status, setStatus] = useState(REQUEST_STATUS.LOADING);
-  const [error, setError] = useState({});
-
-
+  const [{ records: speakers, status, error }, dispatch] = useReducer(
+    requestReducer,
+    {
+      records: [],
+      status: REQUEST_STATUS.LOADING,
+      error: null,
+    },
+  );
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:4000/speakers');
+        const response = await axios.get('http://localhost:4000/speakers/');
+
         dispatch({
-          data: response.data,
-          type: "GET_ALL_SUCCESS"
+          type: GET_ALL_SUCCESS,
+          records: response.data,
         });
       } catch (e) {
-        console.log("error: ", e);
+        console.log('Loading data error', e);
         dispatch({
-          status: REQUEST_STATUS.ERROR,
-          type: 'UPDATE_STATUS',
+          type: GET_ALL_FAILURE,
+          error: e,
         });
-        setError(e);
       }
     };
     fetchData();
@@ -101,7 +85,10 @@ const Speakers = () => {
       {isLoading && <div>Loading...</div>}
       {hasErrored && (
         <div>
-          <br />ERROR: {error.message}
+          Loading error... Is the json-server running? (try "npm run
+          json-server" at terminal prompt)
+          <br />
+          <b>ERROR: {error.message}</b>
         </div>
       )}
       {success && (
